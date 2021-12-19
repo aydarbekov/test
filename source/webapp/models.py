@@ -18,7 +18,7 @@ SEX_CHOICES = {
 }
 
 
-class User(AbstractUser):
+class Client(AbstractUser):
     identity_number = models.CharField(
         max_length=220, null=True, blank=True, verbose_name="Идентификационный номер"
     )
@@ -41,7 +41,7 @@ class User(AbstractUser):
         auto_now=True, verbose_name='Дата изменения'
     )
     status_updated = models.DateTimeField(
-        verbose_name='Дата изменения статуса'
+        null=True, blank=True, verbose_name='Дата изменения статуса'
     )
     is_active = models.BooleanField(
         default=True, verbose_name='Статус'
@@ -53,13 +53,13 @@ class User(AbstractUser):
         max_length=150, choices=TYPE_CHOICES, null=True, blank=True, verbose_name="Пол"
     )
     timezone = models.CharField(
-        max_length=32, choices=TIMEZONES, default='UTC'
+        null=True, blank=True, max_length=32, choices=TIMEZONES, default='UTC'
     )
 
 
 class AdditionalNumbers(models.Model):
     user = models.ForeignKey(
-        "auth.User", on_delete=models.CASCADE, verbose_name="user", related_name="additional_numbers",
+        "Client", on_delete=models.CASCADE, verbose_name="user", related_name="additional_numbers",
     )
     number = PhoneNumberField(
         max_length=20, null=False, blank=False, verbose_name="Дополнительные номера"
@@ -68,7 +68,7 @@ class AdditionalNumbers(models.Model):
 
 class Email(models.Model):
     user = models.ForeignKey(
-        "auth.User", on_delete=models.CASCADE, verbose_name="user", related_name="emails",
+        "Client", on_delete=models.CASCADE, verbose_name="user", related_name="emails",
     )
     models.EmailField(
         blank=True, null=True, verbose_name="Почта"
@@ -77,7 +77,7 @@ class Email(models.Model):
 
 class SocialMedias(models.Model):
     user = models.ForeignKey(
-        "auth.User", on_delete=models.CASCADE, verbose_name="user", related_name="social_medias",
+        "Client", on_delete=models.CASCADE, verbose_name="user", related_name="social_medias",
     )
     ok = models.CharField(
         max_length=220, null=True, blank=True, verbose_name="Одноклассники"
@@ -98,7 +98,7 @@ class SocialMedias(models.Model):
 
 class VkAccounts(models.Model):
     social_medias = models.ForeignKey(
-        "auth.SocialMedias", on_delete=models.CASCADE, verbose_name="social_medias", related_name="vk_accounts",
+        "SocialMedias", on_delete=models.CASCADE, verbose_name="social_medias", related_name="vk_accounts",
     )
     account = models.CharField(
         max_length=220, null=True, blank=True, verbose_name="Вк"
@@ -107,8 +107,32 @@ class VkAccounts(models.Model):
 
 class FbAccounts(models.Model):
     social_medias = models.ForeignKey(
-        "auth.SocialMedias", on_delete=models.CASCADE, verbose_name="social_medias", related_name="fb_accounts",
+        "SocialMedias", on_delete=models.CASCADE, verbose_name="social_medias", related_name="fb_accounts",
     )
     account = models.CharField(
         max_length=220, null=True, blank=True, verbose_name="Фб"
+    )
+
+
+class LegalEntity(models.Model):
+    identity_number = models.CharField(
+        max_length=220, null=True, blank=True, verbose_name="Идентификационный номер"
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='Дата создания'
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True, verbose_name='Дата изменения'
+    )
+    full_name = models.CharField(
+        max_length=150, null=True, blank=True, verbose_name="Полное название"
+    )
+    short_name = models.CharField(
+        max_length=150, null=True, blank=True, verbose_name="Сокращенное название"
+    )
+    inn = models.CharField(
+        max_length=220, null=True, blank=True, verbose_name="ИНН"
+    )
+    kpp = models.CharField(
+        max_length=220, null=True, blank=True, verbose_name="КПП"
     )

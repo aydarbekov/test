@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'webapp',
     'widget_tweaks',
     "phonenumber_field",
+    'mptt',
 ]
 
 MIDDLEWARE = [
@@ -128,3 +129,5 @@ HOST_NAME = 'localhost:8000'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
 MEDIA_URL = '/uploads/'
+
+AUTH_USER_MODEL = 'webapp.Client'
