@@ -168,11 +168,16 @@ class Department(MPTTModel):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.identity_number != '':
-            self.identity_number += '03'
-        if self.parent.level == 7:
-            raise ValueError(u'Достигнута максимальная вложенность!')
-        super().save(*args, **kwargs)
+        if self.identity_number != '' and '-03' not in self.identity_number:
+            self.identity_number += '-03'
+            super().save(*args, **kwargs)
+        if self.parent:
+            max_indent = 7
+            lvl = self.parent.level if self.parent.level else 0
+            if lvl < max_indent - 1:
+                super().save(*args, **kwargs)
+            else:
+                raise ValueError("Максимальная вложенность: %i" % max_indent)
 
     class MPTTMeta:
         order_insertion_by = ['name']
