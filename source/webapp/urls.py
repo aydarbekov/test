@@ -7,6 +7,7 @@ from webapp import views
 router = routers.DefaultRouter()
 
 router.register(r'clients', views.ClientViewSet)
+router.register(r'legalentity', views.LegalEntityViewSet)
 
 app_name = 'webapp'
 

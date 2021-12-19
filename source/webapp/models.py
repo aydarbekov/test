@@ -62,8 +62,8 @@ class Client(AbstractUser):
     )
 
     def save(self, *args, **kwargs):
-        if self.identity_number != '':
-            self.identity_number += '01'
+        if self.identity_number != '' and '-01' not in self.identity_number:
+            self.identity_number += '-01'
         super().save(*args, **kwargs)
 
 
@@ -151,8 +151,8 @@ class LegalEntity(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        if self.identity_number != '':
-            self.identity_number += '02'
+        if self.identity_number != '' and '-02' not in self.identity_number:
+            self.identity_number += '-02'
         super().save(*args, **kwargs)
 
 
