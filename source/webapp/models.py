@@ -1,8 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from mptt.fields import TreeForeignKey
+from mptt.models import MPTTModel
 from phonenumber_field.modelfields import PhoneNumberField
 import pytz
-
 
 TIMEZONES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
 TYPE_CHOICES = (
@@ -55,6 +56,15 @@ class Client(AbstractUser):
     timezone = models.CharField(
         null=True, blank=True, max_length=32, choices=TIMEZONES, default='UTC'
     )
+    departments = models.ManyToManyField(
+        'Department', through='ClientInDep', through_fields=('client', 'department'),
+        verbose_name='Департаменты', related_name='clients'
+    )
+
+    def save(self, *args, **kwargs):
+        if self.identity_number != '':
+            self.identity_number += '01'
+        super().save(*args, **kwargs)
 
 
 class AdditionalNumbers(models.Model):
@@ -135,4 +145,46 @@ class LegalEntity(models.Model):
     )
     kpp = models.CharField(
         max_length=220, null=True, blank=True, verbose_name="КПП"
+    )
+    departments = models.ManyToManyField(
+        'Department', verbose_name='Департаменты', related_name='legalentities'
+    )
+
+    def save(self, *args, **kwargs):
+        if self.identity_number != '':
+            self.identity_number += '02'
+        super().save(*args, **kwargs)
+
+
+class Department(MPTTModel):
+    identity_number = models.CharField(
+        max_length=220, null=True, blank=True, verbose_name="Идентификационный номер"
+    )
+
+    name = models.CharField(max_length=255, null=False, blank=False, unique=True)
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if self.identity_number != '':
+            self.identity_number += '03'
+        if self.parent.level == 7:
+            raise ValueError(u'Достигнута максимальная вложенность!')
+        super().save(*args, **kwargs)
+
+    class MPTTMeta:
+        order_insertion_by = ['name']
+
+
+class ClientInDep(models.Model):
+    client = models.ForeignKey(
+        Client, on_delete=models.CASCADE, verbose_name='Клиент'
+    )
+    department = models.ForeignKey(
+        Department, on_delete=models.CASCADE, verbose_name='Департамент'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='Дата добавления в департамент'
     )
