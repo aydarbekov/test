@@ -8,6 +8,8 @@ router = routers.DefaultRouter()
 
 router.register(r'clients', views.ClientViewSet)
 router.register(r'legalentity', views.LegalEntityViewSet)
+router.register(r'Departments', views.DepartmentSerializerViewSet)
+
 
 app_name = 'webapp'
 

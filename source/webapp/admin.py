@@ -1,5 +1,5 @@
 from django.contrib import admin
-from webapp.models import Client, Department, ClientInDep
+from webapp.models import Client, Department, ClientInDep, LegalEntity
 
 
 class DepartmentClientInline(admin.TabularInline):
@@ -19,6 +19,7 @@ class DepartmentAdmin(admin.ModelAdmin):
         return obj.clients.count()
 
 
+admin.site.register(LegalEntity)
 admin.site.register(Client)
 admin.site.register(Department, DepartmentAdmin)
 # admin.site.register(Department, DepartmentlistAdmin)

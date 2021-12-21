@@ -13,20 +13,25 @@ class ClientSerializer(serializers.ModelSerializer):
         )
 
 
+class DepartmentSerializer(serializers.ModelSerializer):
+    clients = ClientSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Department
+
+        fields = (
+            'identity_number', 'name', 'parent', 'clients'
+        )
+
+
 class LegalEntitySerializer(serializers.ModelSerializer):
+    departments = DepartmentSerializer(many=True, read_only=True)
+
+
     class Meta:
         model = LegalEntity
 
         fields = (
             'identity_number', 'created_at', 'updated_at',
             'full_name', 'short_name', 'inn', 'kpp', 'departments'
-        )
-
-
-class DepartmentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Department
-
-        fields = (
-            'identity_number', 'name', 'parent',
         )
